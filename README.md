@@ -1,5 +1,6 @@
 # PyLogger for Windows
 [![Python](https://img.shields.io/badge/Python-2.7-blue.svg)](https://python.org/)
+[![Windows](https://img.shields.io/badge/Works%20with-Windows%20XP%20and%20above-blue.svg)](https://www.python.org/downloads/windows/)
 
 PyLogger is a simple, easy-to-use keylogging program for Windows.
 
