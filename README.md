@@ -1,4 +1,6 @@
 # PyLogger for Windows
+[![Python](https://img.shields.io/badge/Python-2.7-blue.svg)](https://python.org/)
+
 PyLogger is a simple, easy-to-use keylogging program for Windows.
 
 ## Installing dependencies
@@ -15,17 +17,20 @@ To run the program, you will need the following:
 If the program can't import the required modules, it will warn you with an error message.
 
 
-## Usage
-
-- usage:
-  - keylogger-2.7.py **mode**  *[optional]*
-- mode:
-  - **local:** store the logs in a file *[key.log]*    
+## Using the program (CLI)
+- #### Command Usage:
+  - keylogger-2.7.py **< mode >** *[optional:startup]*
+- #### Modes:
+  - **local:** store the logs in a file *(by default this is set to `key.log`, but can be changed)*
   - **remote:** send the logs to a Google Form. You must specify the Form URL and Field Name in the script.
   - **email:** send the logs to an email. You must specify the SERVER, **PORT, USERNAME, PASSWORD,** and who to send the email to.)
   - **ftp:** upload logs file to an FTP account. You must specify the **SERVER, USERNAME, PASSWORD, SSL OPTION, and OUTPUT DIRECTORY.**)
-- optional
+- #### Optional:
   - **startup:** This will add the keylogger to Windows startup.
 
 ## Compiling
 Once you have set the program up, you can [compile your program into an EXE file.](https://www.youtube.com/watch?v=lOIJIk_maO4)
+
+This is where the `startdefaultmode` variable comes in. Change this variable to `True` to start the program without asking for arguments. This is good for hiding the keylogger, or saving time.
+
+`defaultmode` determines what mode we start in when `startdeaultmode` is True. You can set this to any of the above modes.
